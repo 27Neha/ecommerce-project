@@ -1,0 +1,15 @@
+# Node
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+
+# Next build
+.next/
+
+# Medusa build
+dist/
