@@ -10,17 +10,8 @@ export default function AsmitPage() {
           This is my static page contribution to the ecommerce project.
         </p>
 
-        <div className="flex justify-center mt-10">
-  <a href="/asmit">
-    <button className="px-6 py-3 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 hover:scale-105 transition duration-300">
-      Visit Asmit's Page ✨
-    </button>
-  </a>
-</div>
-
-
         <a href="/">
-          <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300">
+          <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
             Go Back Home
           </button>
         </a>
@@ -28,5 +19,3 @@ export default function AsmitPage() {
     </div>
   );
 }
-
-
