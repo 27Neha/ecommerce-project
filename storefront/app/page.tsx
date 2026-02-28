@@ -1,100 +1,163 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
 
-export default function Home() {
+async function getProducts() {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/products?limit=8`,
+      {
+        headers: {
+          "x-publishable-api-key":
+            process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
+        },
+        cache: "no-store",
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch products")
+    }
+
+    const data = await res.json()
+    return data.products || []
+  } catch (error) {
+    console.error("Product fetch error:", error)
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const products = await getProducts()
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <main className="bg-white text-neutral-900">
 
-        {/* Asmit Button (Top) */}
-        <div className="flex justify-center w-full mb-8">
-          <Link href="/asmit">
-            <button className="px-6 py-3 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 hover:scale-105 transition duration-300">
-              Visit Asmit's Page ✨
-            </button>
-          </Link>
-        </div>
+      {/* ================= HERO SECTION ================= */}
 
-        {/* Logo */}
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
+      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-black/40" />
 
-        {/* Heading Section */}
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+        <div className="relative z-10 text-center text-white px-6">
+          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight leading-tight">
+            Refined. Elevated. Essential.
           </h1>
 
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-6 text-lg md:text-xl max-w-2xl mx-auto text-neutral-200">
+            Discover timeless silhouettes crafted with precision and purpose.
           </p>
+
+          <div className="mt-10">
+            <a
+              href="/products"
+              className="px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 tracking-wide"
+            >
+              DISCOVER COLLECTION
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= FEATURED TITLE ================= */}
+
+      <section className="py-28 px-10 md:px-20">
+        <div className="text-center mb-20">
+          <p className="uppercase tracking-[0.4em] text-sm text-neutral-500 mb-4">
+            Curated Selection
+          </p>
+          <h2 className="text-5xl font-semibold tracking-tight">
+            Signature Essentials
+          </h2>
         </div>
 
-        {/* Bottom Buttons */}
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row sm:items-center">
+        {/* ================= PRODUCTS GRID ================= */}
 
-          <a
-            className="flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
+        {products.length === 0 ? (
+          <p className="text-center text-neutral-500">
+            No products available. Check API configuration.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-14">
+            {products.map((product: any) => {
+              const price =
+                product.variants?.[0]?.prices?.[0]?.amount
 
-          <a
-            className="flex h-12 items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+              return (
+                <div
+                  key={product.id}
+                  className="group cursor-pointer"
+                >
+                  {/* Image Wrapper */}
+                  <div className="relative overflow-hidden bg-neutral-100">
+                    {product.thumbnail ? (
+                      <Image
+                        src={product.thumbnail}
+                        alt={product.title}
+                        width={500}
+                        height={500}
+                        className="w-full h-[380px] object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-[380px] bg-neutral-200" />
+                    )}
+                  </div>
 
-          <Link
-            href="/aryan"
-            className="rounded bg-black px-4 py-2 text-white"
-          >
-            Aryan Page
-          </Link>
+                  {/* Product Info */}
+                  <div className="mt-6 space-y-2">
+                    <h3 className="text-lg font-medium tracking-wide">
+                      {product.title}
+                    </h3>
 
-          <Link
-            href="/neha"
-            className="rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 transition"
-          >
-            Neha Page 
-          </Link>
+                    <p className="text-neutral-600 text-sm">
+                      €
+                      {price ? price / 100 : "—"}
+                    </p>
 
+                    <div className="pt-2">
+                      <span className="text-sm uppercase tracking-widest border-b border-black pb-1 hover:opacity-60 transition">
+                        View Product
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ================= BRAND STATEMENT ================= */}
+
+      <section className="py-32 bg-neutral-50 text-center px-10 md:px-20">
+        <h3 className="text-4xl font-semibold tracking-tight max-w-3xl mx-auto">
+          Designed with intention. Built for longevity.
+        </h3>
+
+        <p className="mt-8 text-neutral-600 max-w-2xl mx-auto leading-relaxed">
+          Our pieces are crafted from premium materials and engineered for
+          enduring performance. Every detail reflects our commitment to
+          refined minimalism and modern sophistication.
+        </p>
+      </section>
+
+      {/* ================= FOOTER PREVIEW ================= */}
+
+      <section className="py-20 border-t border-neutral-200 px-10 md:px-20">
+        <div className="flex flex-col md:flex-row justify-between items-center text-sm text-neutral-600">
+          <p>© 2026 LUXE. All rights reserved.</p>
+          <div className="flex gap-8 mt-4 md:mt-0">
+            <a href="#" className="hover:text-black transition">
+              Instagram
+            </a>
+            <a href="#" className="hover:text-black transition">
+              Twitter
+            </a>
+            <a href="#" className="hover:text-black transition">
+              Contact
+            </a>
+          </div>
         </div>
+      </section>
 
-      </main>
-    </div>
-  );
+    </main>
+  )
 }
